@@ -5,7 +5,14 @@ from .models import VideoPublishedProxy, VideoAllProxy
 
 @admin.register(VideoAllProxy)
 class VideoAllAdmin(admin.ModelAdmin):
-    list_display = ["title", "id", "state", "video_id", "is_published"]
+    list_display = [
+        "title",
+        "id",
+        "state",
+        "video_id",
+        "is_published",
+        "get_playlists_ids",
+    ]
     search_fields = ["title"]
     list_filter = ["state", "active"]
     # у юзеров не будет доступа к полям ниже (всё это будет происходить автоматически)

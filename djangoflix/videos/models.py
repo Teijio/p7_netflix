@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models.signals import pre_save
 from django.utils import timezone
-from django.utils.text import slugify  # изменим title
 from djangoflix.db.models import PublishStateOptions
 from djangoflix.db.receivers import publish_state_pre_save, slugify_pre_save
 
@@ -46,6 +45,10 @@ class Video(models.Model):
     @property
     def is_published(self):
         return self.active
+    
+    def get_playlists_ids(self):
+        # self.<foreigned_obj>_set.all()
+        return list(self.playlist_set.all().values_list("id", flat=True))
 
 
 class VideoAllProxy(Video):

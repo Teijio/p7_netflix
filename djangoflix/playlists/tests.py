@@ -9,26 +9,61 @@ from videos.models import Video
 
 
 class PlaylistModelTestCase(TestCase):
-    def setUp(self):
-        video_a = Video.objects.create(title="Mi title", video_id="abc123")
+    def create_videos(self):
+        video_a = Video.objects.create(title="Mi title1", video_id="abc1")
+        video_b = Video.objects.create(title="Mi title2", video_id="abc2")
+        video_c = Video.objects.create(title="Mi title3", video_id="abc3")
         self.video_a = video_a
+        self.video_b = video_b
+        self.video_c = video_c
+        self.video_qs = Video.objects.all()
+
+    def setUp(self):
+        self.create_videos()
         self.obj_a = Playlist.objects.create(
             title="This is my title",
-            video=video_a,
+            video=self.video_a,
         )
-        self.obj_b = Playlist.objects.create(
+        obj_b = Playlist.objects.create(
             title="This is my title",
             state=PublishStateOptions.PUBLISH,
-            video=video_a
-        )  # в State можно было перерадть "PU"/"DR", ноо можем забыть что это
+            video=self.video_a,
+        )
+        # obj_b.videos.set([self.video_a, self.video_b, self.video_c])
+        obj_b.videos.set(self.video_qs)
+        obj_b.save()
+        self.obj_b = obj_b
+        # в State можно было перерадть "PU"/"DR", ноо можем забыть что это
 
     def test_playlist_video(self):
         self.assertEqual(self.obj_a.video, self.video_a)
 
+    def test_playlist_video_items(self):
+        count = self.obj_b.videos.all().count()
+        self.assertEqual(count, 3)
+
+    def test_playlist_video_through_model(self):
+        v_qs = sorted(list(self.video_qs.values_list("id")))
+        video_qs = sorted(list(self.obj_b.videos.all().values_list("id")))
+        playlist_item_qs = sorted(
+            list(self.obj_b.playlistitem_set.all().values_list("id"))
+        )
+        self.assertEqual(v_qs, video_qs, playlist_item_qs)
+
+    def test_video_playlist_properly(self):
+        ids = self.obj_a.video.get_playlists_ids()
+        actual_ids = list(
+            Playlist.objects.filter(video=self.video_a).values_list(
+                "id", flat=True
+            )
+        )
+        self.assertEqual(ids, actual_ids)
+
+    # playlist_featured - Обращаемся по related_name
     def test_video_playlist(self):
-        qs = self.video_a.playlist_set.all()
+        qs = self.video_a.playlist_featured.all()
         self.assertEqual(qs.count(), 2)
-    
+
     def test_slug_fields(self):
         title = self.obj_a.title
         test_slug = slugify(title)
@@ -55,7 +90,7 @@ class PlaylistModelTestCase(TestCase):
             publish_timestamp__lte=now,
         )
         self.assertTrue(published_qs.exists())
-    
+
     def test_publish_manager(self):
         published_qs = Playlist.objects.all().published()
         published_qs_2 = Playlist.objects.published()

@@ -5,6 +5,7 @@ from djangoflix.db.models import PublishStateOptions
 from djangoflix.db.receivers import publish_state_pre_save, slugify_pre_save
 
 
+# функция нужна чтобы не повторяться
 class VideoQuerySet(models.QuerySet):
     def published(self):
         now = timezone.now()
@@ -25,7 +26,8 @@ class VideoManager(models.Manager):
 class Video(models.Model):
     title = models.CharField(max_length=220)  # name
     description = models.TextField(blank=True, null=True)
-    # слаг автоматически присвоится через функцию save, за счёт slugify(title)
+    # если не указан, то slug автоматически
+    # добавится через функцию save, за счёт slugify(title)
     slug = models.SlugField(blank=True, null=True)  # this is my video
     video_id = models.CharField(max_length=220, unique=True)
     active = models.BooleanField(default=True)
@@ -39,7 +41,6 @@ class Video(models.Model):
     publish_timestamp = models.DateTimeField(
         auto_now_add=False, auto_now=False, blank=True, null=True
     )
-
     objects = VideoManager()
 
     @property
@@ -66,6 +67,4 @@ class VideoPublishedProxy(Video):
 
 
 pre_save.connect(publish_state_pre_save, sender=Video)
-
-
 pre_save.connect(slugify_pre_save, sender=Video)

@@ -22,7 +22,7 @@ class VideoAllAdmin(admin.ModelAdmin):
     class Meta:
         model = VideoAllProxy
 
-    # def published(self, obj, *args, **kwargs):
+    # def is_published(self, obj, *args, **kwargs):
     #     return obj.active
     # сделали эту функцию в классе модели, чтобы админка не была слишком объёмной
 

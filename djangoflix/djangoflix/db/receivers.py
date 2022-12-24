@@ -4,6 +4,7 @@ from django.utils.text import slugify  # изменим title
 from .models import PublishStateOptions
 
 
+# при Publish - добавит дату, при Draft - обнулит
 def publish_state_pre_save(sender, instance, *args, **kwargs):
     is_publish = instance.state == PublishStateOptions.PUBLISH
     is_draft = instance.state == PublishStateOptions.DRAFT
@@ -13,7 +14,6 @@ def publish_state_pre_save(sender, instance, *args, **kwargs):
         instance.publish_timestamp = None
 
 
-# при Publish - добавит дату, при Draft - обнулит
 def slugify_pre_save(sender, instance, *args, **kwargs):
     title = instance.title
     slug = instance.slug

@@ -28,7 +28,7 @@ class PlaylistManager(models.Manager):
 class Playlist(models.Model):
     title = models.CharField(max_length=220)  # name
     description = models.TextField(blank=True, null=True)
-    # слаг автоматически присвоится через функцию save, за счёт slugify(title)
+    # slug автоматически присвоится через функцию save, за счёт slugify(title)
     slug = models.SlugField(blank=True, null=True)
     video = models.ForeignKey(
         Video,

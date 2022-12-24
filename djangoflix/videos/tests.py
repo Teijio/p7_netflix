@@ -16,8 +16,8 @@ class VideoModelTestCase(TestCase):
             title="This is my title",
             state=PublishStateOptions.PUBLISH,
             video_id="abcd",
-        )  # в State можно было перерадть "PU"/"DR", ноо можем забыть что это
-    
+        )  # в State можно было передать "PU"/"DR", ноо можем забыть что это
+
     def test_slug_fields(self):
         title = self.obj_a.title
         test_slug = slugify(title)
@@ -33,7 +33,7 @@ class VideoModelTestCase(TestCase):
         self.assertEqual(qs.count(), 2)
 
     def test_draft_case(self):
-        qs = Video.objects.filter(state=PublishStateOptions.DRAFT)
+        qs = Video.objects.filter(state=PublishStateOptions.DRAFT)  # or "DR"
         self.assertEqual(qs.count(), 1)
 
     def test_publish_case(self):
@@ -44,7 +44,7 @@ class VideoModelTestCase(TestCase):
             publish_timestamp__lte=now,
         )
         self.assertTrue(published_qs.exists())
-    
+
     def test_publish_manager(self):
         published_qs = Video.objects.all().published()
         published_qs_2 = Video.objects.published()

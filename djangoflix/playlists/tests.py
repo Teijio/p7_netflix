@@ -33,7 +33,7 @@ class PlaylistModelTestCase(TestCase):
         obj_b.videos.set(self.video_qs)
         obj_b.save()
         self.obj_b = obj_b
-        # в State можно было перерадть "PU"/"DR", ноо можем забыть что это
+        # в State можно было передать "PU"/"DR", ноо можем забыть что это
 
     def test_playlist_video(self):
         self.assertEqual(self.obj_a.video, self.video_a)
